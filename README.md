@@ -6,6 +6,8 @@ The goal is to create a lite wraper for the blpapi package for a more pythonic i
 Also will attempt to make more comprehensive and documentation, but there already exists the official Bloomberg API documentation.  
 This will also be heavily dependent on the pandas package.  
 
+It would be better to expose the C or C++ api through Cython, but this will do for now.  
+
 ## BLP API Services to Wrap  
 
 ### Reference Data  
