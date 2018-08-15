@@ -14,10 +14,7 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 * Static  
 * Historical  
 * Intraday  
-
-
-### Curves  
-
+* Portfolio
 
 ### VWAP  
 
@@ -27,7 +24,6 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 
 ### Market Bar  
 
-
 ### Field  
 * Field Search  
 * Field Information  
@@ -35,6 +31,9 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 * Categorized Field Search  
 
 ### Instrument  
+* Security
+* Curve
+* Government
 
 ### Equity Screening  
 
