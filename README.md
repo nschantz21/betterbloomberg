@@ -1,6 +1,6 @@
 # betterbloomberg
 
-A better interface for the [Bloomberg Desktop Python API](https://www.bloomberg.com/professional/support/api-library/)  
+A wrapper for the [Bloomberg Desktop Python API](https://www.bloomberg.com/professional/support/api-library/)  
 
 The goal is to create a lite wraper for the blpapi package for a more pythonic interface.  
 Also will attempt to make more comprehensive and documentation, but there already exists the official Bloomberg API documentation.  
