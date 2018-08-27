@@ -5,7 +5,7 @@ Limitations exist on the number of fields for reference and historical data requ
 
 
 import blpapi
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
     
 # I think requires a class hierarchy
@@ -14,14 +14,26 @@ class BlpDataRequest(object):
     def __init__(self, host='localhost', port=8194, service_type=None, request_type=None):
         self.host = host
         self.port = port
-        if service_type is not None:
-            self.service_type = service_type
-        if request_type is not None:
-            self.request_type = request_type
+        if service_type is None:
+            self.service_type = self.__class__.service_type
+        if request_type is None:
+            self.request_type = self.__class__.request_type
         # not sure if I should make these static or class or instance methods
         self.session = BlpDataRequest.session_handle(self.host, self.port)
         self.service = BlpDataRequest.service_handle(self.session, self.service_type)
-        self.request = self.service.createRequest(request_type)
+        self.request = self.service.createRequest(self.request_type)
+       
+    @abstractproperty
+    def service_type(self):
+        pass
+    
+    @abstractproperty
+    def request_type(self):
+        pass
+    
+    @abstractmethod
+    def generate_request(self):
+        pass
     
     def send_request(self, correlation_id = None):
         eQ = blpapi.event.EventQueue()
@@ -34,10 +46,7 @@ class BlpDataRequest(object):
                 # A RESPONSE Message indicates the request has been fully served
                 break
         return eventObj
-    
-    @abstractmethod
-    def generate_request(self):
-        pass
+
     
     @abstractmethod
     def process_request(self):
@@ -63,21 +72,22 @@ class BlpDataRequest(object):
 
 
 class StaticReferenceData(BlpDataRequest):
-    # this class is meant only to handle the service type argument of the 
-    def __init__(self, *args, **kwargs):
-        self.service_type = '//blp/refdata'
-        super(StaticReferenceData, self).__init__(*args, **kwargs)
+    # this class is meant only to handle the service type argument
+    service_type = '//blp/refdata'
+    
+    def __init__(self, **kwargs):
+        super(StaticReferenceData, self).__init__(**kwargs)
         
 
 class ReferenceDataRequest(StaticReferenceData):
-    def __init__(self, securities, fields, overrides=None, *args, **kwargs):
-        self.request_type = "ReferenceDataRequest"
+    request_type = "ReferenceDataRequest"
+    
+    def __init__(self, securities, fields, overrides, **kwargs):
         self.securities = securities
         self.fields = fields
-        if overrides is not None:
-            self.overrides = overrides
-        # I want all those good bits from the parent
-        super(ReferenceDataRequest, self).__init__(*args, **kwargs)
+        self.overrides = overrides
+        super(ReferenceDataRequest, self).__init__(**kwargs)
+        
     
     def generate_request(self):
         # constructing the request
