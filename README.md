@@ -11,10 +11,11 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 ## BLP API Services to Wrap  
 
 ### Reference Data  
-* Static  
-* Historical  
-* Intraday  
+* Static - snapshot of the current value  
+* Historical End-ofDay  
+* Historical Intraday Bar/Tick  
 * Portfolio
+* Equity Screen  
 
 ### VWAP  
 
