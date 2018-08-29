@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 # I think requires a class hierarchy
 class BlpDataRequest(object):
     __metaclass__ = ABCMeta
-    def __init__(self, host='localhost', port=8194, service_type=None, request_type=None):
+    def __init__(self, host='localhost', port=8194, service_type=None, request_type=None, **kwargs):
         self.host = host
         self.port = port
         if service_type is None:
@@ -92,6 +92,7 @@ class ReferenceDataRequest(StaticReferenceData):
     def generate_request(self):
         # constructing the request
         print "gen"
+        
     
     def process_request(self):
         print "proc"
