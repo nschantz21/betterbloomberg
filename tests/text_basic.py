@@ -3,8 +3,11 @@ from betterbloomberg import reference_data
 
 
 
-class TestReferenceData(unittest.TestCase):
+class TestReferenceDataMethods(unittest.TestCase):
     pass
 
-if __name__ == '__main__':
-    unittest.main()
+# I'm not sure I want to do this
+suite = unitTest.TestLoader().loadFromTestCase(TestReferenceDataMethods)
+unittest.TextTestRunner(verbosity=2).run(suite)
+# if __name__ == '__main__':
+#     unittest.main()
