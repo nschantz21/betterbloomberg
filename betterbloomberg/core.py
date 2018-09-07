@@ -1,5 +1,9 @@
+import blpapi
 from abc import ABCMeta, abstractmethod, abstractproperty
+
 class BlpDataRequest(object):
+    # Abstract Base Class for Creating requests
+    
     __metaclass__ = ABCMeta
     
     def __init__(self, host='localhost', port=8194, service_type=None, request_type=None, **kwargs):
@@ -17,10 +21,7 @@ class BlpDataRequest(object):
         self.generate_request()
         self.send_request()
         self.data = self.process_response()
-        self.session.stop()
     
-    # add extra logic to the the destructor to close the service
-       
     @abstractproperty
     def service_type(self):
         pass

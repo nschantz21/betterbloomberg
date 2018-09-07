@@ -5,3 +5,6 @@ I'm not sure there are core functions necessary,
 since each type of request seems to require its own type of processing.
 
 unit testing for each class, or suite for each class
+
+I could add a kind of function dictionary to make the final interface a bit easier.
+Something like betterbloomberg.get_data(request_type, **kwargs)
