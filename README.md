@@ -2,7 +2,7 @@
 
 A wrapper for the [Bloomberg Desktop Python API](https://www.bloomberg.com/professional/support/api-library/)  
 
-The goal is to create a lite wraper for the blpapi package for a more pythonic interface.  
+The goal is to create a lite wrapper for the blpapi package for a more pythonic interface.  
 Also will attempt to make more comprehensive and documentation, but there already exists the official Bloomberg API documentation.  
 This will also be heavily dependent on the pandas package.  
 
