@@ -1,10 +1,8 @@
 import blpapi
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-class BlpDataRequest(object):
+class BlpDataRequest(object, metaclass=ABCMeta):
     # Abstract Base Class for Creating requests
-    
-    __metaclass__ = ABCMeta
     
     def __init__(self, host='localhost', port=8194, service_type=None, request_type=None, **kwargs):
         self.host = host
@@ -64,9 +62,9 @@ class BlpDataRequest(object):
     def service_handle(session, service_type):
         sess = session
         if (not sess.start()):
-            print "Failed to start session"
+            print("Failed to start session")
         # opens the service for the session
         if (not sess.openService(service_type)):
-            print "failed to open {0} service".format(service_type)
+            print("failed to open {0} service".format(service_type))
         return sess.getService(service_type)
         

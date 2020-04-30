@@ -3,7 +3,7 @@
 Limitations exist on the number of fields for reference and historical data request:  400 fields for reference data request and 25 fields for historical data request. There is also a limit on the number of securities enforced by the Session's MaxPendingRequests. API will split the securities in the request into groups of 10 securities and fields into groups of 128 fields. Therefore, depending of the number of securities and fields provided, the number of requests many exceed the default 1,024 MaxPendingRequests limit.
 """
 import blpapi
-from core import BlpDataRequest
+from .core import BlpDataRequest
 
 class StaticReferenceData(BlpDataRequest):
     # this class is meant only to handle the service type argument
@@ -45,7 +45,7 @@ class ReferenceDataRequest(StaticReferenceData):
         # setting the overrides is a bitch.
         # might be a better way to do this
         ovrds = self.request.getElement("overrides")
-        for (k, v) in self.overrides.iteritems():
+        for (k, v) in self.overrides.items():
             ovr = ovrds.appendElement()
             ovr.setElement("fieldId", k)
             ovr.setElement("value", v)
@@ -62,7 +62,7 @@ class ReferenceDataRequest(StaticReferenceData):
     def process_response(self):
         my_dict = dict()
         y = blpapi.event.MessageIterator(self.response).next().getElement("securityData")
-        for i in xrange(y.numValues()):
+        for i in range(y.numValues()):
             temp_sec = y.getValueAsElement(i)
             sec_id = temp_sec.getElement('security').getValue()
             my_dict[sec_id] = dict()

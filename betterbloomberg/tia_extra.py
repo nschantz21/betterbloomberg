@@ -40,7 +40,7 @@ class Window(object):
         self.name = name
 
     def displaySecurityInfo(self, msg):
-        print "%s: %s" % (self.name, msg)
+        print("%s: %s" % (self.name, msg))
 
         
         
@@ -50,7 +50,7 @@ def easyRequest(sess, req, **kwargs):
     req : Request
     **kwargs : dict
     """
-    for (k, v) in kwargs.iteritems():
+    for (k, v) in kwargs.items():
         for i in v:
             req.append(k, i)
     eventQueue = blpapi.event.EventQueue()
@@ -88,11 +88,11 @@ def field_information(field_id, docs=False, overrides=False, print_request=False
     # starts the session
     session = blpapi.Session(sessionOptions)
     if (not session.start()):
-        print "Failed to start session"
+        print("Failed to start session")
 
     # opens the service for the session
     if (not session.openService("//blp/apiflds")):
-        print "failed to open //blp/fields service"
+        print("failed to open //blp/fields service")
 
     # get the service
     fieldDataService = session.getService("//blp/apiflds")
@@ -105,7 +105,7 @@ def field_information(field_id, docs=False, overrides=False, print_request=False
             request.append("properties", "fieldoverridable")
             
     if print_request:
-        print request
+        print(request)
     
     my_event = easyRequest(session, request)
     del request
@@ -117,7 +117,7 @@ def field_information(field_id, docs=False, overrides=False, print_request=False
 
     securityData = blpapi.event.MessageIterator(my_event).next().getElement(SECURITY_DATA)
 
-    for i in xrange(securityData.numValues()):
+    for i in range(securityData.numValues()):
         tmp_sec = securityData.getValueAsElement(i)
         fid = tmp_sec.getElementAsString("id")
         my_dict[fid] = dict()
@@ -125,13 +125,13 @@ def field_information(field_id, docs=False, overrides=False, print_request=False
             my_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(f)
         if overrides:
             ovrd_list = list()
-            for j in xrange(tmp_sec.getElement(FIELD_DATA).getElement('overrides').numValues()):
+            for j in range(tmp_sec.getElement(FIELD_DATA).getElement('overrides').numValues()):
                 ovrd_list.append(tmp_sec.getElement(FIELD_DATA).getElement('overrides').getValue(j))
             my_dict[fid]['overrides'] = ovrd_list 
     
     if verbose:
         for msg in my_event:
-            print msg
+            print(msg)
     
     field_frame = pd.DataFrame.from_dict(my_dict, orient='index')
     
@@ -156,11 +156,11 @@ def government_lookup(query, ticker='', partialMatch=True, maxResults=100, print
     # starts the session
     session = blpapi.Session(sessionOptions)
     if (not session.start()):
-        print "Failed to start session"
+        print("Failed to start session")
     
     # opens the service for the session
     if (not session.openService("//blp/instruments")):
-        print "failed to open //blp/instruments service"
+        print("failed to open //blp/instruments service")
     
     # get the service
     secfService = session.getService("//blp/instruments")
@@ -174,7 +174,7 @@ def government_lookup(query, ticker='', partialMatch=True, maxResults=100, print
     test_event = easyRequest(session, request)
     
     if print_request:
-        print request
+        print(request)
     del request
 
     RESULTS_DATA = blpapi.Name("results")
@@ -182,7 +182,7 @@ def government_lookup(query, ticker='', partialMatch=True, maxResults=100, print
     govtData = blpapi.event.MessageIterator(test_event).next().getElement(RESULTS_DATA)
 
     sec_dict = dict()
-    for i in xrange(govtData.numValues()):
+    for i in range(govtData.numValues()):
         tmp_sec = govtData.getValueAsElement(i)
         p_key = tmp_sec.getElementAsString('parseky')
         sec_dict[p_key] = dict()
@@ -222,11 +222,11 @@ def security_lookup(query, yellowKeyFilter="YK_FILTER_INDX", languageOverride="L
     # starts the session
     session = blpapi.Session(sessionOptions)
     if (not session.start()):
-        print "Failed to start session"
+        print("Failed to start session")
 
     # opens the service for the session
     if (not session.openService("//blp/instruments")):
-        print "failed to open //blp/instruments service"
+        print("failed to open //blp/instruments service")
 
     # get the service
     secfService = session.getService("//blp/instruments")
@@ -240,7 +240,7 @@ def security_lookup(query, yellowKeyFilter="YK_FILTER_INDX", languageOverride="L
     request.set("maxResults", maxResults)
     
     if print_request:
-        print request
+        print(request)
 
     test_event = easyRequest(session, request)
     del request
@@ -250,7 +250,7 @@ def security_lookup(query, yellowKeyFilter="YK_FILTER_INDX", languageOverride="L
     securityData = blpapi.event.MessageIterator(test_event).next().getElement(RESULTS_DATA)
 
     sec_dict = dict()
-    for i in xrange(securityData.numValues()):
+    for i in range(securityData.numValues()):
         tmp_sec = securityData.getValueAsElement(i)
         sec_dict[tmp_sec.getElementAsString('security')] = tmp_sec.getElementAsString('description')
 
@@ -275,11 +275,11 @@ def curve_lookup(query, bbgid='', countryCode='', currencyCode='', curveid='', c
     # starts the session
     session = blpapi.Session(sessionOptions)
     if (not session.start()):
-        print "Failed to start session"
+        print("Failed to start session")
 
     # opens the service for the session
     if (not session.openService("//blp/instruments")):
-        print "failed to open //blp/instruments service"
+        print("failed to open //blp/instruments service")
     
     # get the service
     secfService = session.getService("//blp/instruments")
@@ -299,7 +299,7 @@ def curve_lookup(query, bbgid='', countryCode='', currencyCode='', curveid='', c
         request.set("subtype", subtype)
     
     if print_request:
-        print request
+        print(request)
     
     test_event = easyRequest(session, request)
     del request
@@ -308,7 +308,7 @@ def curve_lookup(query, bbgid='', countryCode='', currencyCode='', curveid='', c
 
     securityData = blpapi.event.MessageIterator(test_event).next().getElement(RESULTS_DATA)
     sec_dict = dict()
-    for i in xrange(securityData.numValues()):
+    for i in range(securityData.numValues()):
         tmp_sec = securityData.getValueAsElement(i)
         curve_id = tmp_sec.getElementAsString('curve')
         sec_dict[curve_id] = dict()
@@ -317,7 +317,7 @@ def curve_lookup(query, bbgid='', countryCode='', currencyCode='', curveid='', c
             sec_dict[curve_id][j] = tmp_sec.getElementAsString(j)
         for k in ['type', 'subtype']:
             data_list = list()
-            for l in xrange(tmp_sec.getElement(k).numValues()):
+            for l in range(tmp_sec.getElement(k).numValues()):
                 data_list.append(tmp_sec.getElement(k).getValueAsString(l))
             sec_dict[curve_id][k] = data_list
 
@@ -338,11 +338,11 @@ def portfolio_data_request(portfolio_id, field='PORTFOLIO_MWEIGHT', ref_date=Non
     # starts the session
     session = blpapi.Session(sessionOptions)
     if (not session.start()):
-        print "Failed to start session"
+        print("Failed to start session")
 
     # opens the service for the session
     if (not session.openService("//blp/refdata")):
-        print "failed to open //blp/refdata service"
+        print("failed to open //blp/refdata service")
 
     # get the service
     secfService = session.getService("//blp/refdata")
@@ -376,7 +376,7 @@ def portfolio_data_request(portfolio_id, field='PORTFOLIO_MWEIGHT', ref_date=Non
                 self.name = name
 
             def displaySecurityInfo(self, msg):
-                print "%s: %s" % (self.name, msg)
+                print("%s: %s" % (self.name, msg))
         
         eventQueue = blpapi.event.EventQueue()
         # this part is different
@@ -402,7 +402,7 @@ def portfolio_data_request(portfolio_id, field='PORTFOLIO_MWEIGHT', ref_date=Non
 
     port_dict = {}
     
-    for i in xrange(positions.numValues()):
+    for i in range(positions.numValues()):
         pos = positions.getValue(i)
         sec_name = pos.getElementAsString("Security")
         sec_weight = pos.getElementAsString("Weight")
