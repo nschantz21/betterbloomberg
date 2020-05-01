@@ -5,7 +5,14 @@ from abc import ABCMeta, abstractmethod
 class BlpDataRequest(object, metaclass=ABCMeta):
     # Abstract Base Class for Creating requests
 
-    def __init__(self, host='localhost', port=8194, service_type=None, request_type=None, **kwargs):
+    def __init__(
+            self,
+            host='localhost',
+            port=8194,
+            service_type=None,
+            request_type=None,
+            **kwargs
+    ):
         self.host = host
         self.port = port
         if service_type is None:

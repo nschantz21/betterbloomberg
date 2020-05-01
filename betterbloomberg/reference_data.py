@@ -25,16 +25,26 @@ class ReferenceDataRequest(StaticReferenceData):
     request_type = "ReferenceDataRequest"
 
     def __init__(self, securities, fields, overrides=None, **kwargs):
-        """
-        securities : array-like
+        """ReferenceDataRequest
+
+
+
+        securities : array-like, str
             security identifiers
-        fields : array-like
+        fields : array-like, str
             reference fields
         overrides : dict
             override fields and values
+
         """
-        self.securities = securities
-        self.fields = fields
+        if type(securities) == list:
+            self.securities = securities
+        else:
+            self.securities = [securities, ]
+        if type(fields) == list:
+            self.fields = fields
+        else:
+            self.fields = [fields, ]
         if overrides is not None:
             self.overrides = overrides
         else:
@@ -58,11 +68,12 @@ class ReferenceDataRequest(StaticReferenceData):
 
 
     def processBulkField(refBulkfield):
+        print(refBulkfield.name())
         # get the total number of Bulk data points
+        numofBulkValues = refBulkfield.numValues()
         # get the number of subfields for each bulk data element
         # read each field in bulk data
         # return a dictionary of dictionaries
-        pass
 
 
     # there are a lot of helper functions that could be made for this
