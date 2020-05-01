@@ -11,6 +11,7 @@ default 1,024 MaxPendingRequests limit.
 """
 import blpapi
 from .core import BlpDataRequest
+import pandas as pd
 
 
 class StaticReferenceData(BlpDataRequest):
@@ -67,24 +68,49 @@ class ReferenceDataRequest(StaticReferenceData):
             ovr.setElement("value", v)
 
 
-    def processBulkField(refBulkfield):
-        print(refBulkfield.name())
-        # get the total number of Bulk data points
+    @staticmethod
+    def process_bulk_field(refBulkfield):
+        response_list = []
         numofBulkValues = refBulkfield.numValues()
-        # get the number of subfields for each bulk data element
-        # read each field in bulk data
-        # return a dictionary of dictionaries
+        for bvCtr in range(numofBulkValues):
+            bulkElement = refBulkfield.getValueAsElement(bvCtr)
+            # get the number of subfields for each bulk data element
+            numofBulkElements = bulkElement.numElements()
+            bulk_dict = dict()
+            for beCtr in range(numofBulkElements):
+                elem = bulkElement.getElement(beCtr)
+                bulk_dict[str(elem.name())] = elem.getValue()
+            response_list.append(bulk_dict)
+        return response_list
 
 
     # there are a lot of helper functions that could be made for this
-    def process_response(self):
-        my_dict = dict()
-        y = blpapi.event.MessageIterator(self.response).next().getElement("securityData")
-        for i in range(y.numValues()):
-            temp_sec = y.getValueAsElement(i)
+    def process_response(self, blk=False):
+        # determine if bulk data has been received
+        response_dict = dict()
+        securities = (
+            blpapi
+                .event
+                .MessageIterator(self.response)
+                .next()
+                .getElement("securityData")
+        )
+        # iterate through the securities
+        for i in range(securities.numValues()):
+            temp_sec = securities.getValueAsElement(i)
             sec_id = temp_sec.getElement('security').getValue()
-            my_dict[sec_id] = dict()
+            response_dict[sec_id] = dict()
             sec_flds = temp_sec.getElement('fieldData')
-            for j in sec_flds.elements():
-                my_dict[sec_id][str(j.name())] = j.getValue()
-        return my_dict
+            # iterate through fields
+            for field in sec_flds.elements():
+                # bulk data processing
+                if field.isArray():
+                    bulk_data = pd.DataFrame(
+                        ReferenceDataRequest.process_bulk_field(field)
+                    )
+                    response_dict[sec_id][str(field.name())] = bulk_data
+
+                else:
+                    response_dict[sec_id][str(field.name())] = field.getValue()
+        return response_dict
+

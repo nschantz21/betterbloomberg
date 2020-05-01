@@ -1,9 +1,11 @@
 import blpapi
+import pandas as pd
 from abc import ABCMeta, abstractmethod
 
 
 class BlpDataRequest(object, metaclass=ABCMeta):
     # Abstract Base Class for Creating requests
+    use_pandas = True
 
     def __init__(
             self,
@@ -54,6 +56,8 @@ class BlpDataRequest(object, metaclass=ABCMeta):
         self.response = eventObj
 
     def get_data(self):
+        if self.use_pandas:
+            self.data = pd.DataFrame(self.data)
         return self.data
 
     @abstractmethod
