@@ -49,7 +49,7 @@ class BlpDataRequest(object, metaclass=ABCMeta):
             cid = blpapi.CorrelationId(correlation_id)
         self.session.sendRequest(self.request, eventQueue=eQ)
         while True:
-            eventObj = eQ.nextEvent()
+            eventObj = eQ.nextEvent(timeout=500)
             if eventObj.eventType() == blpapi.event.Event.RESPONSE:
                 # A RESPONSE Message indicates the request has been fully served
                 break

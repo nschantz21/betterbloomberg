@@ -12,7 +12,7 @@ default 1,024 MaxPendingRequests limit.
 import blpapi
 from .core import BlpDataRequest
 import pandas as pd
-
+from datetime import date
 
 class StaticReferenceData(BlpDataRequest):
     # this class is meant only to handle the service type argument
@@ -27,8 +27,6 @@ class ReferenceDataRequest(StaticReferenceData):
 
     def __init__(self, securities, fields, overrides=None, **kwargs):
         """ReferenceDataRequest
-
-
 
         securities : array-like, str
             security identifiers
@@ -84,9 +82,7 @@ class ReferenceDataRequest(StaticReferenceData):
         return response_list
 
 
-    # there are a lot of helper functions that could be made for this
-    def process_response(self, blk=False):
-        # determine if bulk data has been received
+    def process_response(self):
         response_dict = dict()
         securities = (
             blpapi
@@ -113,4 +109,94 @@ class ReferenceDataRequest(StaticReferenceData):
                 else:
                     response_dict[sec_id][str(field.name())] = field.getValue()
         return response_dict
+
+
+
+class HistoricalDataRequest(ReferenceDataRequest):
+    request_type = "HistoricalDataRequest"
+
+    def __init__(self,
+                 securities,
+                 fields,
+                 start,
+                 end: str=None,
+                 period: str="DAILY",
+                 period_adjust: str="ACTUAL",
+                 overrides=None,
+                 **kwargs):
+        """HistoricalDataRequest
+
+        securities:
+        fields:
+        overrides:
+        periodicity:
+        start:
+        end:
+        overrides:
+
+        """
+        self.start = start
+        if end is None:
+            end = date.today().strftime("%Y%m%d")
+        self.end = end
+        self.period = period
+        self.period_adjust = period_adjust
+        super(HistoricalDataRequest, self).__init__(
+            securities, fields, overrides, **kwargs
+        )
+
+    def generate_request(self):
+        # call the parent generate request
+        super(HistoricalDataRequest, self).generate_request()
+        self.request.set("periodicitySelection", self.period)
+        self.request.set("periodicityAdjustment", self.period_adjust)
+        self.request.set("startDate", self.start)
+        self.request.set("endDate", self.end)
+        self.request.set("maxDataPoints", 100)
+
+    def _process_response(self):
+        print(self.request)
+        while(True):
+            event = self.session.nextEvent()
+            msgIter = blpapi.event.MessageIterator(self.response)
+            while(msgIter.next()):
+                msg = msgIter.message()
+                if (
+                        (event.eventType() != blpapi.Event.PARTIAL_RESPONSE) &
+                        (event.eventType() != blpapi.Event.RESPONSE)
+                ):
+                    continue
+                securityData = msg.getElement("securityData")
+                securityName = SecurityData.getElement("SecurityName")
+
+                print(securityName)
+
+
+    def process_response(self):
+        data_dict = dict()
+        for message in self.response:
+            security_data = message.getElement("securityData")
+            sec_id = security_data.getElement("security").getValue()
+            record_list = list()
+            field_data = security_data.getElement("fieldData")
+            for i in range(field_data.numValues()):
+                pt = field_data.getValue(i)
+                record = dict()
+                for element in pt.elements():
+                    record[str(element.name())] = element.getValue()
+                record_list.append(record)
+            data_dict[sec_id] = record_list
+        res_list = []
+        for security, records in data_dict.items():
+            res = pd.DataFrame(records).set_index("date")
+            res.columns = pd.MultiIndex.from_tuples(
+                [(security, x) for x in res.columns]
+            )
+            res_list.append(res)
+        return pd.concat(res_list, axis=1)
+
+
+
+
+
 
