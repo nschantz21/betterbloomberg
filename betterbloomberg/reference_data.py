@@ -145,6 +145,7 @@ class HistoricalDataRequest(ReferenceDataRequest):
             securities, fields, overrides, **kwargs
         )
 
+
     def generate_request(self):
         # call the parent generate request
         super(HistoricalDataRequest, self).generate_request()
@@ -154,49 +155,43 @@ class HistoricalDataRequest(ReferenceDataRequest):
         self.request.set("endDate", self.end)
         self.request.set("maxDataPoints", 100)
 
-    def _process_response(self):
-        print(self.request)
-        while(True):
-            event = self.session.nextEvent()
-            msgIter = blpapi.event.MessageIterator(self.response)
-            while(msgIter.next()):
-                msg = msgIter.message()
-                if (
-                        (event.eventType() != blpapi.Event.PARTIAL_RESPONSE) &
-                        (event.eventType() != blpapi.Event.RESPONSE)
-                ):
-                    continue
-                securityData = msg.getElement("securityData")
-                securityName = SecurityData.getElement("SecurityName")
 
-                print(securityName)
+    def send_request(self, correlation_id=None):
+        eQ = blpapi.event.EventQueue()
+        if correlation_id is not None:
+            cid = blpapi.CorrelationId(correlation_id)
+        self.session.sendRequest(self.request, eventQueue=eQ)
+        event_list = []
+        while True:
+            eventObj = eQ.nextEvent(timeout=500)
+            event_list.append(eventObj)
+            if eventObj.eventType() == blpapi.event.Event.RESPONSE:
+                # A RESPONSE Message indicates the request has been fully served
+                break
+        self.response = event_list
 
 
     def process_response(self):
         data_dict = dict()
-        for message in self.response:
-            security_data = message.getElement("securityData")
-            sec_id = security_data.getElement("security").getValue()
-            record_list = list()
-            field_data = security_data.getElement("fieldData")
-            for i in range(field_data.numValues()):
-                pt = field_data.getValue(i)
-                record = dict()
-                for element in pt.elements():
-                    record[str(element.name())] = element.getValue()
-                record_list.append(record)
-            data_dict[sec_id] = record_list
-        res_list = []
-        for security, records in data_dict.items():
-            res = pd.DataFrame(records).set_index("date")
-            res.columns = pd.MultiIndex.from_tuples(
-                [(security, x) for x in res.columns]
-            )
-            res_list.append(res)
+        for event in self.response:
+            for message in event:
+                security_data = message.getElement("securityData")
+                sec_id = security_data.getElement("security").getValue()
+                record_list = list()
+                field_data = security_data.getElement("fieldData")
+                for i in range(field_data.numValues()):
+                    pt = field_data.getValue(i)
+                    record = dict()
+                    for element in pt.elements():
+                        record[str(element.name())] = element.getValue()
+                    record_list.append(record)
+                data_dict[sec_id] = record_list
+            res_list = []
+            for security, records in data_dict.items():
+                res = pd.DataFrame(records).set_index("date")
+                res.columns = pd.MultiIndex.from_tuples(
+                    [(security, x) for x in res.columns]
+                )
+                res_list.append(res)
         return pd.concat(res_list, axis=1)
-
-
-
-
-
 
