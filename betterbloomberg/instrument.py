@@ -57,29 +57,24 @@ class Government(Instrument):
         self.request.set('maxResults', self.max_results)
 
     def process_response(self):
-        my_dict = dict()
-        SECURITY_DATA = blpapi.Name("fieldData")
-        FIELD_DATA = blpapi.Name("fieldInfo")
-        security_data = (
+        RESULTS_DATA = blpapi.Name("results")
+
+        govtData = (
             blpapi
-                .event
-                .MessageIterator(self.response)
-                .next()
-                .getElement(SECURITY_DATA)
+            .event
+            .MessageIterator(self.response)
+            .next()
+            .getElement(RESULTS_DATA)
         )
 
-        for i in range(security_data.numValues()):
-            tmp_sec = security_data.getValueAsElement(i)
-            fid = tmp_sec.getElementAsString("id")
-            my_dict[fid] = dict()
-            for f in ['mnemonic', 'description', 'documentation']:
-                my_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(f)
-            if overrides:
-                ovrd_list = list()
-                for j in range(tmp_sec.getElement(FIELD_DATA).getElement('overrides').numValues()):
-                    ovrd_list.append(tmp_sec.getElement(FIELD_DATA).getElement('overrides').getValue(j))
-                my_dict[fid]['overrides'] = ovrd_list
-        return my_dict
+        sec_dict = dict()
+        for i in range(govtData.numValues()):
+            tmp_sec = govtData.getValueAsElement(i)
+            p_key = tmp_sec.getElementAsString('parseky')
+            sec_dict[p_key] = dict()
+            for j in ['name', 'ticker']:
+                sec_dict[p_key][j] = tmp_sec.getElementAsString(j)
+        return sec_dict
 
 
 
