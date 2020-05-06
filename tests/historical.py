@@ -5,5 +5,4 @@ req = HistoricalDataRequest(
     ["PX_LAST", "OPEN"],
     "20200402"
 )
-print(req.get_data())
-
+print(req.data)

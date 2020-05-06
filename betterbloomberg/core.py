@@ -30,6 +30,20 @@ class BlpDataRequest(object, metaclass=ABCMeta):
         self.send_request()
         self.data = self.process_response()
 
+    @property
+    def data(self):
+        if self.use_pandas:
+            return pd.DataFrame(self.__data)
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = value
+
+    @data.deleter
+    def data(self):
+        del self.__data
+
     @abstractmethod
     def service_type(self):
         pass
@@ -55,10 +69,6 @@ class BlpDataRequest(object, metaclass=ABCMeta):
                 break
         self.response = eventObj
 
-    def get_data(self):
-        if self.use_pandas:
-            self.data = pd.DataFrame(self.data)
-        return self.data
 
     @abstractmethod
     def process_response(self):
