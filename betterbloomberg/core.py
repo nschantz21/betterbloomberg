@@ -44,13 +44,15 @@ class BlpDataRequest(object, metaclass=ABCMeta):
     def data(self):
         del self.__data
 
+    @property
     @abstractmethod
     def service_type(self):
         pass
 
+    @property
     @abstractmethod
     def request_type(self):
-        pass
+        return NotImplementedError
 
     @abstractmethod
     def generate_request(self):
