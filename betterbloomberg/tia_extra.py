@@ -195,7 +195,12 @@ def government_lookup(query, ticker='', partialMatch=True, maxResults=100, print
     return results
 
 
-def security_lookup(query, yellowKeyFilter="YK_FILTER_INDX", languageOverride="LANG_OVERRIDE_ENGLISH", maxResults=100, print_request=False):
+def security_lookup(
+        query,
+        yellowKeyFilter="YK_FILTER_INDX",
+        languageOverride="LANG_OVERRIDE_ENGLISH",
+        maxResults=100,
+        print_request=False):
     """
     The Security Lookup (a.k.a. Instrument Lookup) Request constructs a search based upon the "query" Element's string value, as well as the additional filters such as the yellow key and language override Elements. This functionality can also be found on the Bloomberg Professional service using the SECF <GO> function. By setting the language override Element, users get results translated into the specified language.
     
