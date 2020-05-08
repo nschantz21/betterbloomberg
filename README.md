@@ -13,7 +13,7 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 ### Reference Data  
 * Static - snapshot of the current value  
 * Historical End-ofDay  
-* Historical Intraday Bar/Tick  
+* ~~Historical Intraday Bar/Tick~~ - Not Authorized
 * Portfolio
 * Equity Screen  
 
