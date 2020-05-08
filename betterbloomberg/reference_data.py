@@ -86,10 +86,10 @@ class ReferenceDataRequest(StaticReferenceData):
         response_dict = dict()
         securities = (
             blpapi
-                .event
-                .MessageIterator(self.response)
-                .next()
-                .getElement("securityData")
+            .event
+            .MessageIterator(self.response)
+            .next()
+            .getElement("securityData")
         )
         # iterate through the securities
         for i in range(securities.numValues()):
