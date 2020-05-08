@@ -12,7 +12,7 @@ default 1,024 MaxPendingRequests limit.
 import blpapi
 from .core import BlpDataRequest
 import pandas as pd
-from datetime import date
+from datetime import date, datetime
 
 class StaticReferenceData(BlpDataRequest):
     # this class is meant only to handle the service type argument
@@ -194,4 +194,3 @@ class HistoricalDataRequest(ReferenceDataRequest):
                 )
                 res_list.append(res)
         return pd.concat(res_list, axis=1)
-
