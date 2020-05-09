@@ -52,7 +52,7 @@ class BlpDataRequest(object, metaclass=ABCMeta):
     @property
     @abstractmethod
     def request_type(self):
-        return NotImplementedError
+        pass
 
     @abstractmethod
     def generate_request(self):

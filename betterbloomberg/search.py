@@ -123,7 +123,7 @@ class Security(Instrument):
         if value not in self.yk_filters:
             print(self.yk_filters)
             print(value)
-            raise("Not valid yellow key")
+            raise AttributeError
         else:
             self.__yellow_key_filter = value
 
