@@ -12,7 +12,7 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 
 ### Reference Data  
 * Static - snapshot of the current value  
-* Historical End-ofDay  
+* Historical End-of-Day  
 * ~~Historical Intraday Bar/Tick~~ - Not Authorized
 * Portfolio
 * Equity Screen  
@@ -20,25 +20,25 @@ It would be better to expose the C or C++ api through Cython, but this will do f
 ### VWAP  
 
 ### Market Data  
+probably not worth it.
 
-### Market List
+#### Market List
 
-### Market Bar  
+#### Market Bar  
 
-### Field  
+### Field 
 * Field Search  
 * Field Information  
-* Field List  
-* Categorized Field Search  
+* ~~Field List~~  - these are pretty much covered by the field search
+* ~~Categorized Field Search~~  
 
-### Instrument  
+### Instrument Search 
 * Security
 * Curve
 * Government
 
-### Equity Screening  
-
 ### Page Data  
+probably not worth it  
 
 ### Technical Analysis  
 
