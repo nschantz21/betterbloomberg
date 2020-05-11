@@ -2,6 +2,7 @@ import blpapi
 from .core import BlpDataRequest
 import pandas as pd
 
+
 class Instrument(BlpDataRequest):
     service_type = "//blp/instruments"
 
@@ -23,13 +24,21 @@ class Government(Instrument):
 
     request_type = "govtListRequest"
 
-    def __init__(
-            self,
-            query,
-            ticker="",
-            partial_match=True,
-            max_results=100,
-            **kwargs):
+    def __init__(self, query, ticker="", partial_match=True, max_results=100, **kwargs):
+        """
+        Government Security Lookup
+
+        Parameters
+        ----------
+        query : str
+            search query
+        ticker : str
+            ticker
+        partial_match : bool
+
+        max_results : int
+            max results to return
+        """
         self.query = query
         self.partial_match = partial_match
         self.ticker = ticker
@@ -39,27 +48,23 @@ class Government(Instrument):
 
     def generate_request(self):
         self.request.set("query", self.query)
-        self.request.set('partialMatch', self.partial_match)
-        self.request.set('ticker', self.ticker)
-        self.request.set('maxResults', self.max_results)
+        self.request.set("partialMatch", self.partial_match)
+        self.request.set("ticker", self.ticker)
+        self.request.set("maxResults", self.max_results)
 
     def process_response(self):
         RESULTS_DATA = blpapi.Name("results")
 
         govtData = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
-            .next()
-            .getElement(RESULTS_DATA)
+            blpapi.event.MessageIterator(self.response).next().getElement(RESULTS_DATA)
         )
 
         sec_dict = dict()
         for i in range(govtData.numValues()):
             tmp_sec = govtData.getValueAsElement(i)
-            p_key = tmp_sec.getElementAsString('parseky')
+            p_key = tmp_sec.getElementAsString("parseky")
             sec_dict[p_key] = dict()
-            for j in ['name', 'ticker']:
+            for j in ["name", "ticker"]:
                 sec_dict[p_key][j] = tmp_sec.getElementAsString(j)
         return sec_dict  # might need to be orient = "index"
 
@@ -79,8 +84,6 @@ class Government(Instrument):
     @data.deleter
     def data(self):
         del self.__data
-
-
 
 
 class Security(Instrument):
@@ -108,6 +111,20 @@ class Security(Instrument):
             language_override="LANG_OVERRIDE_ENGLISH",
             max_results=100,
             **kwargs):
+        """
+        Security Instrument Search
+
+        Parameters
+        ----------
+        query : str
+            search query
+        yellow_key_filter : str
+            valid security field
+        language_override : str
+            valid language code
+        max_results : int
+            max results to return
+        """
         self.query = query
         self.yellow_key_filter = yellow_key_filter
         self.language_override = language_override
@@ -140,31 +157,23 @@ class Security(Instrument):
     def process_response(self):
         RESULTS_DATA = blpapi.Name("results")
         securityData = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
-            .next()
-            .getElement(RESULTS_DATA)
+            blpapi.event.MessageIterator(self.response).next().getElement(RESULTS_DATA)
         )
         sec_dict = dict()
         for i in range(securityData.numValues()):
             tmp_sec = securityData.getValueAsElement(i)
-            security = tmp_sec.getElementAsString('security')
-            sec_dict[security] = tmp_sec.getElementAsString('description')
+            security = tmp_sec.getElementAsString("security")
+            sec_dict[security] = tmp_sec.getElementAsString("description")
         return sec_dict
 
     @property
     def data(self):
         if self.use_pandas:
             frame = pd.DataFrame.from_dict(
-                self.__data, orient="index", columns=["desc"])
-            # parse the security identifier
-            frame.index = (
-                frame.index
-                .str.replace("[<>]", " ")
-                .str.strip()
-                .str.upper()
+                self.__data, orient="index", columns=["desc"]
             )
+            # parse the security identifier
+            frame.index = frame.index.str.replace("[<>]", " ").str.strip().str.upper()
             return frame
         else:
             return self.__data
@@ -184,6 +193,7 @@ class Curve(Instrument):
     currency code, type, subtype, Curve-specific ID and the Bloomberg ID for that
     Curve
     """
+
     request_type = "curveListRequest"
 
     def __init__(
@@ -197,6 +207,28 @@ class Curve(Instrument):
             subtype=None,
             max_results=100,
             **kwargs):
+        """
+        Curve List Search Request
+
+        Parameters
+        ----------
+        query : str
+            query string
+        bbgid : str
+            Bloomberg ID
+        country_code : str
+            Bloomberg Country Code
+        currency_code : str
+            Bloomberg Currency Code
+        curve_id : str
+            Curve Id
+        curve_type : str
+            Curve Type
+        subtype : str
+            Curve Subtype
+        max_results : int
+            max results to return
+        """
         self.query = query
         self.bbgid = bbgid
         self.country_code = country_code
@@ -207,7 +239,6 @@ class Curve(Instrument):
         self.max_results = max_results
 
         super(Curve, self).__init__(**kwargs)
-
 
     def generate_request(self):
         self.request.set("query", self.query)
@@ -224,21 +255,23 @@ class Curve(Instrument):
         RESULTS_DATA = blpapi.Name("results")
 
         securityData = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
-            .next()
-            .getElement(RESULTS_DATA)
+            blpapi.event.MessageIterator(self.response).next().getElement(RESULTS_DATA)
         )
         sec_dict = dict()
         for i in range(securityData.numValues()):
             tmp_sec = securityData.getValueAsElement(i)
-            curve_id = tmp_sec.getElementAsString('curve')
+            curve_id = tmp_sec.getElementAsString("curve")
             sec_dict[curve_id] = dict()
-            for j in ['description', 'country', 'currency',
-                      'curveid', 'publisher', 'bbgid']:
+            for j in [
+                "description",
+                "country",
+                "currency",
+                "curveid",
+                "publisher",
+                "bbgid",
+            ]:
                 sec_dict[curve_id][j] = tmp_sec.getElementAsString(j)
-            for k in ['type', 'subtype']:
+            for k in ["type", "subtype"]:
                 data_list = list()
                 for l in range(tmp_sec.getElement(k).numValues()):
                     data_list.append(tmp_sec.getElement(k).getValueAsString(l))

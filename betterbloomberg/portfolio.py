@@ -2,10 +2,25 @@ import blpapi
 import pandas as pd
 from .reference_data import StaticReferenceData
 
+
 class PortfolioDataRequest(StaticReferenceData):
     request_type = "PortfolioDataRequest"
 
-    def __init__(self, port_id, field="PORTFOLIO_MWEIGHT", ref_date=None, **kwargs):
+    def __init__(self, port_id: str, field: str="PORTFOLIO_MWEIGHT", ref_date: str=None, **kwargs):
+        """
+        Portfolio Data Request
+
+        Paramters
+        ---------
+        port_id : str
+            Portfolio ID found through the PRTU function in the Terminal.
+            Format is "Uxxxxxxxx-xx Client".
+        field : str
+            The field to associate with each position
+        ref_date : str
+            Reference date for the portfolio holdings.
+            Format is "YYYYMMDD"
+        """
         self.port_id = port_id
         self.field = field
         self.ref_data = ref_date
@@ -28,11 +43,7 @@ class PortfolioDataRequest(StaticReferenceData):
         RESULTS_DATA = blpapi.Name("securityData")
 
         securityData = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
-            .next()
-            .getElement(RESULTS_DATA)
+            blpapi.event.MessageIterator(self.response).next().getElement(RESULTS_DATA)
         )
         secdata2 = securityData.getValue(0)
         fld_data = secdata2.getElement("fieldData")
@@ -50,10 +61,8 @@ class PortfolioDataRequest(StaticReferenceData):
     @property
     def data(self):
         if self.use_pandas:
-            frame = pd.DataFrame.from_dict(
-                self.__data,
-                orient='index')
-            frame = frame[0].rename('weight').astype(float)
+            frame = pd.DataFrame.from_dict(self.__data, orient="index")
+            frame = frame[0].rename("weight").astype(float)
             return frame
         else:
             return self.__data
@@ -65,5 +74,3 @@ class PortfolioDataRequest(StaticReferenceData):
     @data.deleter
     def data(self):
         del self.__data
-
-

@@ -2,16 +2,18 @@ import blpapi
 import pandas as pd
 from .core import BlpDataRequest
 
+
 class FieldRequest(BlpDataRequest):
     service_type = "//blp/apiflds"
+
 
 class FieldInfo(FieldRequest):
     request_type = "FieldInfoRequest"
 
     def __init__(self, field_id, docs=False, overrides=False, verbose=False, **kwargs):
         """
-        Field Information Request: Provides a description of the specified fields in
-        the request.
+        Field Information Request: Provides a description of the specified fields
+        in the request.
 
         Parameters
         ----------
@@ -23,9 +25,6 @@ class FieldInfo(FieldRequest):
             overrides : bool
                 Returns a value for the element that describes the behavior of the
                 field requested.  It will give a list of overrides for that field
-
-        Returns : dataframe
-            it's pretty self-explanatory
         """
 
         self.field_id = field_id
@@ -47,23 +46,33 @@ class FieldInfo(FieldRequest):
         SECURITY_DATA = blpapi.Name("fieldData")
         FIELD_DATA = blpapi.Name("fieldInfo")
 
-        securityData = blpapi.event.MessageIterator(self.response).next().getElement(SECURITY_DATA)
+        securityData = (
+            blpapi.event.MessageIterator(self.response).next().getElement(SECURITY_DATA)
+        )
 
-        sub_fields = ['mnemonic', 'description']
+        sub_fields = ["mnemonic", "description"]
         if self.docs:
-            sub_fields.append('documentation')
+            sub_fields.append("documentation")
 
         for i in range(securityData.numValues()):
             tmp_sec = securityData.getValueAsElement(i)
             fid = tmp_sec.getElementAsString("id")
             field_dict[fid] = dict()
             for f in sub_fields:
-                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(f)
+                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(
+                    f
+                )
             if self.overrides:
                 ovrd_list = list()
-                for j in range(tmp_sec.getElement(FIELD_DATA).getElement('overrides').numValues()):
-                    ovrd_list.append(tmp_sec.getElement(FIELD_DATA).getElement('overrides').getValue(j))
-                field_dict[fid]['overrides'] = ovrd_list
+                for j in range(
+                    tmp_sec.getElement(FIELD_DATA).getElement("overrides").numValues()
+                ):
+                    ovrd_list.append(
+                        tmp_sec.getElement(FIELD_DATA)
+                        .getElement("overrides")
+                        .getValue(j)
+                    )
+                field_dict[fid]["overrides"] = ovrd_list
 
         return field_dict
 
@@ -83,7 +92,6 @@ class FieldInfo(FieldRequest):
         del self.__data
 
 
-
 class FieldSearch(FieldRequest):
     request_type = "FieldSearchRequest"
 
@@ -100,7 +108,7 @@ class FieldSearch(FieldRequest):
         "Metadata",
         "Ratings",
         "Trading",
-        "Systems"
+        "Systems",
     }
 
     product_types = {
@@ -114,35 +122,29 @@ class FieldSearch(FieldRequest):
         "Equity",
         "Cmdty",
         "Index",
-        "Curncy"
+        "Curncy",
     }
 
-    field_type = {
-        "All",
-        "RealTime",
-        "Static"
-    }
+    field_type = {"All", "RealTime", "Static"}
 
-    bps_requirement ={
-        "All",
-        "BPS",
-        "NoBPS"
-    }
+    bps_requirement = {"All", "BPS", "NoBPS"}
 
     def __init__(
-            self,
-            query,
-            docs=True,
-            inc_product_type=None,
-            inc_categories=None,
-            inc_field_type=None,
-            inc_bps_requirement="All",
-            exc_product_type=None,
-            exc_categories=None,
-            exc_field_type=None,
-            exc_bps_requirement=None,
-            lang="ENGLISH",
-            **kwargs):
+        self,
+        query,
+        docs=True,
+        inc_product_type=None,
+        inc_categories=None,
+        inc_field_type=None,
+        inc_bps_requirement="All",
+        exc_product_type=None,
+        exc_categories=None,
+        exc_field_type=None,
+        exc_bps_requirement=None,
+        lang="ENGLISH",
+        **kwargs
+    ):
+        """Field Search Request"""
         self.query = query
         self.docs = docs
         self.inc_product_type = inc_product_type
@@ -155,7 +157,6 @@ class FieldSearch(FieldRequest):
         self.exc_bpsRequirement = exc_bps_requirement
         self.lang = lang
         super(FieldSearch, self).__init__(**kwargs)
-
 
     def generate_request(self):
         self.request.set("searchSpec", self.query)
@@ -188,29 +189,38 @@ class FieldSearch(FieldRequest):
         if self.exc_bpsRequirement is not None:
             excludes.setElement("bpsRequirement", self.exc_bpsRequirement)
 
-
     def process_response(self):
         field_dict = dict()
 
         SECURITY_DATA = blpapi.Name("fieldData")
         FIELD_DATA = blpapi.Name("fieldInfo")
 
-        securityData = blpapi.event.MessageIterator(self.response).next().getElement(SECURITY_DATA)
+        securityData = (
+            blpapi.event.MessageIterator(self.response).next().getElement(SECURITY_DATA)
+        )
 
-        sub_fields = ['mnemonic', 'description', "categoryName"]
+        sub_fields = ["mnemonic", "description", "categoryName"]
         if self.docs:
-            sub_fields.append('documentation')
+            sub_fields.append("documentation")
 
         for i in range(securityData.numValues()):
             tmp_sec = securityData.getValueAsElement(i)
             fid = tmp_sec.getElementAsString("id")
             field_dict[fid] = dict()
             for f in sub_fields:
-                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(f)
+                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(
+                    f
+                )
                 ovrd_list = list()
-                for j in range(tmp_sec.getElement(FIELD_DATA).getElement('overrides').numValues()):
-                    ovrd_list.append(tmp_sec.getElement(FIELD_DATA).getElement('overrides').getValue(j))
-                field_dict[fid]['overrides'] = ovrd_list
+                for j in range(
+                    tmp_sec.getElement(FIELD_DATA).getElement("overrides").numValues()
+                ):
+                    ovrd_list.append(
+                        tmp_sec.getElement(FIELD_DATA)
+                        .getElement("overrides")
+                        .getValue(j)
+                    )
+                field_dict[fid]["overrides"] = ovrd_list
 
         return field_dict
 
@@ -227,4 +237,4 @@ class FieldSearch(FieldRequest):
 
     @data.deleter
     def data(self):
-        self.__data
+        del self.__data

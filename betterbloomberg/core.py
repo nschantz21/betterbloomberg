@@ -4,34 +4,33 @@ from abc import ABCMeta, abstractmethod
 
 
 class BlpDataRequest(object, metaclass=ABCMeta):
-    # Abstract Base Class for Creating requests
     use_pandas = True
 
     def __init__(
-            self,
-            host='localhost',
-            port=8194,
-            service_type=None,
-            request_type=None,
-            **kwargs
+        self,
+        host="localhost",
+        port=8194,
+        service_type=None,
+        request_type=None,
+        **kwargs
     ):
+        """Abstract Bloomberg Request class"""
         self.host = host
         self.port = port
         if service_type is None:
             self.service_type = self.__class__.service_type
         if request_type is None:
             self.request_type = self.__class__.request_type
-        # not sure if I should make these static or class or instance methods
         self.session = BlpDataRequest.session_handle(self.host, self.port)
         self.service = BlpDataRequest.service_handle(self.session, self.service_type)
         self.request = self.service.createRequest(self.request_type)
-        # not sure if these should be included at this level
         self.generate_request()
         self.send_request()
         self.data = self.process_response()
 
     @property
     def data(self):
+        """Handler for Data member. This is the processed response."""
         if self.use_pandas:
             return pd.DataFrame(self.__data)
         return self.__data
@@ -58,8 +57,8 @@ class BlpDataRequest(object, metaclass=ABCMeta):
     def generate_request(self):
         pass
 
-    # I don't think this needs to be an abstract method
-    def send_request(self, correlation_id=None):
+    def send_request(self, correlation_id: int = None) -> None:
+        """Send the constructed request through the service member."""
         eQ = blpapi.event.EventQueue()
         if correlation_id is not None:
             cid = blpapi.CorrelationId(correlation_id)
@@ -71,13 +70,13 @@ class BlpDataRequest(object, metaclass=ABCMeta):
                 break
         self.response = eventObj
 
-
     @abstractmethod
     def process_response(self):
         pass
 
     @staticmethod
-    def session_handle(host, port):
+    def session_handle(host: str, port: int):
+        """Session handler. Add options"""
         sessionOptions = blpapi.SessionOptions()
         sessionOptions.setServerHost(host)
         sessionOptions.setServerPort(port)
@@ -86,10 +85,11 @@ class BlpDataRequest(object, metaclass=ABCMeta):
 
     @staticmethod
     def service_handle(session, service_type):
+        """Service handler. Fail if session does not start."""
         sess = session
-        if (not sess.start()):
+        if not sess.start():
             print("Failed to start session")
         # opens the service for the session
-        if (not sess.openService(service_type)):
+        if not sess.openService(service_type):
             print("failed to open {0} service".format(service_type))
         return sess.getService(service_type)

@@ -2,10 +2,33 @@ import blpapi
 import pandas as pd
 from .reference_data import StaticReferenceData
 
+
 class EQS(StaticReferenceData):
     request_type = "BeqsRequest"
 
-    def __init__(self, name: str, screen_type: str, group: str, date=None, lang="ENGLISH", **kwargs):
+    def __init__(
+            self,
+            name: str,
+            screen_type: str,
+            group: str,
+            date=None,
+            lang="ENGLISH",
+            **kwargs):
+        """
+
+        Parameters
+        ----------
+        name : str
+            Equity Screen name
+        screen_type : str
+            Screen type
+        group : str
+            Group name
+        date : str
+            Format is YYYYMMDD
+        lang : str
+            Valid Language Code
+        """
         self.name = name
         self.screen_type = screen_type
         self.group = group
@@ -24,23 +47,20 @@ class EQS(StaticReferenceData):
             overrider.setElement("fieldId", "PiTDate")
             overrider.setElement("value", self.date)
 
-
     def process_response(self):
         response_dict = dict()
 
         securities = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
+            blpapi.event.MessageIterator(self.response)
             .next()
             .getElement("data")
             .getElement("securityData")
         )
         for i in range(securities.numValues()):
             temp_sec = securities.getValueAsElement(i)
-            sec_id = temp_sec.getElement('security').getValue()
+            sec_id = temp_sec.getElement("security").getValue()
             response_dict[sec_id] = dict()
-            sec_flds = temp_sec.getElement('fieldData')
+            sec_flds = temp_sec.getElement("fieldData")
             for field in sec_flds.elements():
                 response_dict[sec_id][str(field.name())] = field.getValue()
         return response_dict
@@ -60,4 +80,3 @@ class EQS(StaticReferenceData):
     @data.deleter
     def data(self):
         del self.__data
-

@@ -14,11 +14,13 @@ from .core import BlpDataRequest
 import pandas as pd
 from datetime import date, datetime
 
+
 class StaticReferenceData(BlpDataRequest):
     # this class is meant only to handle the service type argument
-    service_type = '//blp/refdata'
+    service_type = "//blp/refdata"
 
     def __init__(self, **kwargs):
+        """Abstract Class for Reference Data Services"""
         super(StaticReferenceData, self).__init__(**kwargs)
 
 
@@ -26,30 +28,34 @@ class ReferenceDataRequest(StaticReferenceData):
     request_type = "ReferenceDataRequest"
 
     def __init__(self, securities, fields, overrides=None, **kwargs):
-        """ReferenceDataRequest
+        """Reference Data Request
 
+        Parameters
+        ----------
         securities : array-like, str
             security identifiers
         fields : array-like, str
             reference fields
         overrides : dict
             override fields and values
-
         """
         if type(securities) == list:
             self.securities = securities
         else:
-            self.securities = [securities, ]
+            self.securities = [
+                securities,
+            ]
         if type(fields) == list:
             self.fields = fields
         else:
-            self.fields = [fields, ]
+            self.fields = [
+                fields,
+            ]
         if overrides is not None:
             self.overrides = overrides
         else:
             self.overrides = dict()
         super(ReferenceDataRequest, self).__init__(**kwargs)
-
 
     def generate_request(self):
         # constructing the request
@@ -64,7 +70,6 @@ class ReferenceDataRequest(StaticReferenceData):
             ovr = ovrds.appendElement()
             ovr.setElement("fieldId", k)
             ovr.setElement("value", v)
-
 
     @staticmethod
     def process_bulk_field(refBulkfield):
@@ -81,22 +86,19 @@ class ReferenceDataRequest(StaticReferenceData):
             response_list.append(bulk_dict)
         return response_list
 
-
     def process_response(self):
         response_dict = dict()
         securities = (
-            blpapi
-            .event
-            .MessageIterator(self.response)
+            blpapi.event.MessageIterator(self.response)
             .next()
             .getElement("securityData")
         )
         # iterate through the securities
         for i in range(securities.numValues()):
             temp_sec = securities.getValueAsElement(i)
-            sec_id = temp_sec.getElement('security').getValue()
+            sec_id = temp_sec.getElement("security").getValue()
             response_dict[sec_id] = dict()
-            sec_flds = temp_sec.getElement('fieldData')
+            sec_flds = temp_sec.getElement("fieldData")
             # iterate through fields
             for field in sec_flds.elements():
                 # bulk data processing
@@ -111,29 +113,36 @@ class ReferenceDataRequest(StaticReferenceData):
         return response_dict
 
 
-
 class HistoricalDataRequest(ReferenceDataRequest):
     request_type = "HistoricalDataRequest"
 
-    def __init__(self,
-                 securities,
-                 fields,
-                 start,
-                 end: str=None,
-                 period: str="DAILY",
-                 period_adjust: str="ACTUAL",
-                 overrides=None,
-                 **kwargs):
-        """HistoricalDataRequest
+    def __init__(
+        self,
+        securities,
+        fields,
+        start,
+        end: str = None,
+        period: str = "DAILY",
+        period_adjust: str = "ACTUAL",
+        overrides=None,
+        **kwargs
+    ):
+        """Historical Data Request
 
-        securities:
-        fields:
-        overrides:
-        periodicity:
-        start:
-        end:
-        overrides:
-
+        Parameters
+        ----------
+        securities : str or list
+            Security Identifiers
+        fields : str or list
+            Security Fields
+        overrides : dict
+            dictionary of overrides
+        periodicity : str
+            one of the valid periodicity values
+        start : str
+            YYYYMMDD format
+        end : str
+            YYYYMMDD format
         """
         self.start = start
         if end is None:
@@ -145,7 +154,6 @@ class HistoricalDataRequest(ReferenceDataRequest):
             securities, fields, overrides, **kwargs
         )
 
-
     def generate_request(self):
         # call the parent generate request
         super(HistoricalDataRequest, self).generate_request()
@@ -154,7 +162,6 @@ class HistoricalDataRequest(ReferenceDataRequest):
         self.request.set("startDate", self.start)
         self.request.set("endDate", self.end)
         self.request.set("maxDataPoints", 100)
-
 
     def send_request(self, correlation_id=None):
         eQ = blpapi.event.EventQueue()
@@ -169,7 +176,6 @@ class HistoricalDataRequest(ReferenceDataRequest):
                 # A RESPONSE Message indicates the request has been fully served
                 break
         self.response = event_list
-
 
     def process_response(self):
         data_dict = dict()
