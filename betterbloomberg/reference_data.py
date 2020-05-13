@@ -14,6 +14,7 @@ from .core import BlpDataRequest
 import pandas as pd
 from datetime import date, datetime
 
+__all__ = ["ReferenceDataRequest", "HistoricalDataRequest"]
 
 class StaticReferenceData(BlpDataRequest):
     # this class is meant only to handle the service type argument

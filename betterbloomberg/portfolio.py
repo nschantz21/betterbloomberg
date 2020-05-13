@@ -2,6 +2,7 @@ import blpapi
 import pandas as pd
 from .reference_data import StaticReferenceData
 
+__all__ = ["PortfolioDataRequest",]
 
 class PortfolioDataRequest(StaticReferenceData):
     request_type = "PortfolioDataRequest"

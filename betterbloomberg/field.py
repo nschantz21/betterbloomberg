@@ -2,6 +2,7 @@ import blpapi
 import pandas as pd
 from .core import BlpDataRequest
 
+__all__ = ["FieldInfo", "FieldSearch"]
 
 class FieldRequest(BlpDataRequest):
     service_type = "//blp/apiflds"
