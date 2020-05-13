@@ -2,7 +2,7 @@ import blpapi
 import pandas as pd
 from .reference_data import StaticReferenceData
 
-__all__ = ["EQS"]
+__all__ = ["EQS", ]
 
 class EQS(StaticReferenceData):
     request_type = "BeqsRequest"

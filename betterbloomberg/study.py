@@ -2,7 +2,7 @@ import blpapi
 from .core import BlpDataRequest
 import pandas as pd
 
-__all__ = ["Study"]
+__all__ = ["Study", ]
 
 class Study(BlpDataRequest):
     service_type = "//blp/tasvc"

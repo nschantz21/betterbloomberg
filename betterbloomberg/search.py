@@ -2,7 +2,7 @@ import blpapi
 from .core import BlpDataRequest
 import pandas as pd
 
-__all__ = ["Government", "Security", "Curve"]
+__all__ = ["GovernmentSearch", "SecuritySearch", "CurveSearch"]
 
 class Instrument(BlpDataRequest):
     service_type = "//blp/instruments"
@@ -11,7 +11,7 @@ class Instrument(BlpDataRequest):
         super(Instrument, self).__init__(**kwargs)
 
 
-class Government(Instrument):
+class GovernmentSearch(Instrument):
     """
     The Government Lookup Request searches through government securities.
     As with all Requests, users can specify the "query" string and the maximum
@@ -87,7 +87,7 @@ class Government(Instrument):
         del self.__data
 
 
-class Security(Instrument):
+class SecuritySearch(Instrument):
     request_type = "instrumentListRequest"
 
     yk_filters = {
@@ -188,7 +188,7 @@ class Security(Instrument):
         del self.__data
 
 
-class Curve(Instrument):
+class CurveSearch(Instrument):
     """
     The Curve Lookup Request can retrieve a Curve based on its country code,
     currency code, type, subtype, Curve-specific ID and the Bloomberg ID for that
