@@ -48,7 +48,11 @@ class FieldInfo(FieldRequest):
         FIELD_DATA = blpapi.Name("fieldInfo")
 
         securityData = (
-            blpapi.event.MessageIterator(self.response).next().getElement(SECURITY_DATA)
+            blpapi
+            .event
+            .MessageIterator(self.response)
+            .next()
+            .getElement(SECURITY_DATA)
         )
 
         sub_fields = ["mnemonic", "description"]
@@ -60,9 +64,7 @@ class FieldInfo(FieldRequest):
             fid = tmp_sec.getElementAsString("id")
             field_dict[fid] = dict()
             for f in sub_fields:
-                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(
-                    f
-                )
+                field_dict[fid][f] = tmp_sec.getElement(FIELD_DATA).getElementAsString(f)
             if self.overrides:
                 ovrd_list = list()
                 for j in range(
@@ -131,21 +133,22 @@ class FieldSearch(FieldRequest):
     bps_requirement = {"All", "BPS", "NoBPS"}
 
     def __init__(
-        self,
-        query,
-        docs=True,
-        inc_product_type=None,
-        inc_categories=None,
-        inc_field_type=None,
-        inc_bps_requirement="All",
-        exc_product_type=None,
-        exc_categories=None,
-        exc_field_type=None,
-        exc_bps_requirement=None,
-        lang="ENGLISH",
-        **kwargs
-    ):
-        """Field Search Request"""
+            self,
+            query,
+            docs=True,
+            inc_product_type=None,
+            inc_categories=None,
+            inc_field_type=None,
+            inc_bps_requirement="All",
+            exc_product_type=None,
+            exc_categories=None,
+            exc_field_type=None,
+            exc_bps_requirement=None,
+            lang="ENGLISH",
+            **kwargs):
+        """
+        Field Search Request
+        """
         self.query = query
         self.docs = docs
         self.inc_product_type = inc_product_type

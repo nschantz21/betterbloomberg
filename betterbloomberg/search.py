@@ -45,7 +45,7 @@ class GovernmentSearch(Instrument):
         self.ticker = ticker
         self.max_results = max_results
 
-        super(Government, self).__init__(**kwargs)
+        super(GovernmentSearch, self).__init__(**kwargs)
 
     def generate_request(self):
         self.request.set("query", self.query)
@@ -130,7 +130,7 @@ class SecuritySearch(Instrument):
         self.yellow_key_filter = yellow_key_filter
         self.language_override = language_override
         self.max_results = max_results
-        super(Security, self).__init__(**kwargs)
+        super(SecuritySearch, self).__init__(**kwargs)
 
     @property
     def yellow_key_filter(self):
@@ -138,8 +138,8 @@ class SecuritySearch(Instrument):
 
     @yellow_key_filter.setter
     def yellow_key_filter(self, value):
-        if value not in self.yk_filters:
-            print(self.yk_filters)
+        if value not in self.__class__.yk_filters:
+            print(self.__class__.yk_filters)
             print(value)
             raise AttributeError
         else:
@@ -239,7 +239,7 @@ class CurveSearch(Instrument):
         self.subtype = subtype
         self.max_results = max_results
 
-        super(Curve, self).__init__(**kwargs)
+        super(CurveSearch, self).__init__(**kwargs)
 
     def generate_request(self):
         self.request.set("query", self.query)

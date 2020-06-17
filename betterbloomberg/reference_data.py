@@ -201,3 +201,16 @@ class HistoricalDataRequest(ReferenceDataRequest):
                 )
                 res_list.append(res)
         return pd.concat(res_list, axis=1)
+
+    @property
+    def data(self):
+        if self.use_pandas:
+            frame = pd.DataFrame(self.__data)
+            frame.index = pd.to_datetime(frame.index)
+            return frame
+        else:
+            return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = value

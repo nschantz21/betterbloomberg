@@ -81,7 +81,7 @@ class Study(BlpDataRequest):
         )
 
         # study interval
-        # study_attributes.getElement("period").setValue(self.interval)
+        study_attributes.getElement("period").setValue(self.interval)
 
         # data price sources
         # idk where you find the naming conventions for this

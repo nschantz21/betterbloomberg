@@ -7,14 +7,15 @@ class BlpDataRequest(object, metaclass=ABCMeta):
     use_pandas = True
 
     def __init__(
-        self,
-        host="localhost",
-        port=8194,
-        service_type=None,
-        request_type=None,
-        **kwargs
-    ):
-        """Abstract Bloomberg Request class"""
+            self,
+            host="localhost",
+            port=8194,
+            service_type=None,
+            request_type=None,
+            **kwargs):
+        """
+        Abstract Bloomberg Request Class
+        """
         self.host = host
         self.port = port
         if service_type is None:
@@ -58,7 +59,9 @@ class BlpDataRequest(object, metaclass=ABCMeta):
         pass
 
     def send_request(self, correlation_id: int = None) -> None:
-        """Send the constructed request through the service member."""
+        """
+        Send the constructed request through the service member.
+        """
         eQ = blpapi.event.EventQueue()
         if correlation_id is not None:
             cid = blpapi.CorrelationId(correlation_id)
