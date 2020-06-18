@@ -24,7 +24,7 @@ class TestReferenceRequest(unittest.TestCase):
                 "bad sec",
                 self.field
             )
-        self.assertEquals(ex.exception.args[-1][-1], "INVALID_SECURITY")
+        self.assertEqual(ex.exception.args[-1][-1], "INVALID_SECURITY")
 
     def test_not_all_bad(self):
         data = bb.ReferenceDataRequest(
@@ -35,7 +35,7 @@ class TestReferenceRequest(unittest.TestCase):
             self.field,
             ignore_sec_error=True
         ).data
-        print(data)
+        self.assertFalse(data.empty)
 
 
 class TestHistoricalRequest(unittest.TestCase):
@@ -59,4 +59,23 @@ class TestHistoricalRequest(unittest.TestCase):
             1.473  # price on 1999-01-04
         )
 
+    def test_bad_sec(self):
+        with self.assertRaises(Exception) as ex:
+            bb.HistoricalDataRequest(
+                "bad sec",
+                self.field,
+                self.start_date,
+                self.end_date
+            )
+        self.assertEqual(ex.exception.args[-1][-1], "INVALID_SECURITY")
+
+    def test_one_bad_sec(self):
+        data = bb.HistoricalDataRequest(
+            self.ticker + ["bad sec", ],
+            self.field,
+            self.start_date,
+            self.end_date,
+            ignore_sec_error=True
+        ).data
+        self.assertFalse(data.empty)
 

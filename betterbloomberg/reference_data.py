@@ -190,6 +190,8 @@ class HistoricalDataRequest(ReferenceDataRequest):
             for message in event:
                 security_data = message.getElement("securityData")
                 sec_id = security_data.getElement("security").getValue()
+                if security_data.hasElement("securityError") and not self.ignore_sec_error:
+                    raise Exception(to_security_error(sec_id, security_data.getElement("securityError")))
                 record_list = list()
                 field_data = security_data.getElement("fieldData")
                 for i in range(field_data.numValues()):
@@ -201,6 +203,8 @@ class HistoricalDataRequest(ReferenceDataRequest):
                 data_dict[sec_id] = record_list
             res_list = []
             for security, records in data_dict.items():
+                if len(records) == 0:
+                    continue
                 res = pd.DataFrame(records).set_index("date")
                 res.columns = pd.MultiIndex.from_tuples(
                     [(security, x) for x in res.columns]
