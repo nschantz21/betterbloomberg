@@ -18,6 +18,26 @@ class TestReferenceRequest(unittest.TestCase):
             data.values[0][0]
         )
 
+    def test_security_error(self):
+        with self.assertRaises(Exception) as ex:
+            bb.ReferenceDataRequest(
+                "bad sec",
+                self.field
+            )
+        self.assertEquals(ex.exception.args[-1][-1], "INVALID_SECURITY")
+
+    def test_not_all_bad(self):
+        data = bb.ReferenceDataRequest(
+            [
+                "AAPL US Equity",
+                "bad sec"
+            ],
+            self.field,
+            ignore_sec_error=True
+        ).data
+        print(data)
+
+
 class TestHistoricalRequest(unittest.TestCase):
 
     def setUp(self) -> None:

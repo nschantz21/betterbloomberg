@@ -13,6 +13,7 @@ import blpapi
 from .core import BlpDataRequest
 import pandas as pd
 from datetime import date, datetime
+from .errors import to_security_error
 
 __all__ = ["ReferenceDataRequest", "HistoricalDataRequest"]
 
@@ -28,7 +29,7 @@ class StaticReferenceData(BlpDataRequest):
 class ReferenceDataRequest(StaticReferenceData):
     request_type = "ReferenceDataRequest"
 
-    def __init__(self, securities, fields, overrides=None, **kwargs):
+    def __init__(self, securities, fields, overrides=None, ignore_sec_error=False, **kwargs):
         """Reference Data Request
 
         Parameters
@@ -39,6 +40,8 @@ class ReferenceDataRequest(StaticReferenceData):
             reference fields
         overrides : dict
             override fields and values
+        ignore_sec_error : bool
+            ignore security errors raised
         """
         if type(securities) == list:
             self.securities = securities
@@ -56,6 +59,7 @@ class ReferenceDataRequest(StaticReferenceData):
             self.overrides = overrides
         else:
             self.overrides = dict()
+        self.ignore_sec_error = ignore_sec_error
         super(ReferenceDataRequest, self).__init__(**kwargs)
 
     def generate_request(self):
@@ -99,6 +103,8 @@ class ReferenceDataRequest(StaticReferenceData):
             temp_sec = securities.getValueAsElement(i)
             sec_id = temp_sec.getElement("security").getValue()
             response_dict[sec_id] = dict()
+            if temp_sec.hasElement("securityError") and not self.ignore_sec_error:
+                raise Exception(to_security_error(sec_id, temp_sec.getElement("securityError")))
             sec_flds = temp_sec.getElement("fieldData")
             # iterate through fields
             for field in sec_flds.elements():
