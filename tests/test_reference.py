@@ -37,6 +37,15 @@ class TestReferenceRequest(unittest.TestCase):
         ).data
         self.assertFalse(data.empty)
 
+    def test_bad_field(self):
+        with self.assertRaises(Exception) as ex:
+            data = bb.ReferenceDataRequest(
+                self.ticker,
+                "bad field"
+            )
+
+        self.assertEqual(ex.exception.args[0][0][-1], "INVALID_FIELD")
+
 
 class TestHistoricalRequest(unittest.TestCase):
 

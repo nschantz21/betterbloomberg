@@ -13,7 +13,7 @@ import blpapi
 from .core import BlpDataRequest
 import pandas as pd
 from datetime import date, datetime
-from .errors import to_security_error
+from .errors import to_security_error, as_field_error
 
 __all__ = ["ReferenceDataRequest", "HistoricalDataRequest"]
 
@@ -105,6 +105,10 @@ class ReferenceDataRequest(StaticReferenceData):
             response_dict[sec_id] = dict()
             if temp_sec.hasElement("securityError") and not self.ignore_sec_error:
                 raise Exception(to_security_error(sec_id, temp_sec.getElement("securityError")))
+            if temp_sec.hasElement("fieldExceptions"):
+                field_exceptions = temp_sec.getElement("fieldExceptions")
+                raise Exception(as_field_error(sec_id, field_exceptions))
+
             sec_flds = temp_sec.getElement("fieldData")
             # iterate through fields
             for field in sec_flds.elements():
