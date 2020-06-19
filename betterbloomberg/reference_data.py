@@ -29,7 +29,7 @@ class StaticReferenceData(BlpDataRequest):
 class ReferenceDataRequest(StaticReferenceData):
     request_type = "ReferenceDataRequest"
 
-    def __init__(self, securities, fields, overrides=None, ignore_sec_error=False, **kwargs):
+    def __init__(self, securities, fields, overrides=None, ignore_sec_error=False, ignore_field_error=False, **kwargs):
         """Reference Data Request
 
         Parameters
@@ -60,6 +60,7 @@ class ReferenceDataRequest(StaticReferenceData):
         else:
             self.overrides = dict()
         self.ignore_sec_error = ignore_sec_error
+        self.ignore_field_error = ignore_field_error
         super(ReferenceDataRequest, self).__init__(**kwargs)
 
     def generate_request(self):
@@ -103,9 +104,11 @@ class ReferenceDataRequest(StaticReferenceData):
             temp_sec = securities.getValueAsElement(i)
             sec_id = temp_sec.getElement("security").getValue()
             response_dict[sec_id] = dict()
+
             if temp_sec.hasElement("securityError") and not self.ignore_sec_error:
                 raise Exception(to_security_error(sec_id, temp_sec.getElement("securityError")))
-            if temp_sec.hasElement("fieldExceptions"):
+
+            if (temp_sec.getElement("fieldExceptions").numValues() > 0) and not self.ignore_field_error:
                 field_exceptions = temp_sec.getElement("fieldExceptions")
                 raise Exception(as_field_error(sec_id, field_exceptions))
 
@@ -194,8 +197,14 @@ class HistoricalDataRequest(ReferenceDataRequest):
             for message in event:
                 security_data = message.getElement("securityData")
                 sec_id = security_data.getElement("security").getValue()
+
                 if security_data.hasElement("securityError") and not self.ignore_sec_error:
                     raise Exception(to_security_error(sec_id, security_data.getElement("securityError")))
+
+                if (security_data.getElement("fieldExceptions").numValues() > 0) and not self.ignore_field_error:
+                    field_exceptions = security_data.getElement("fieldExceptions")
+                    raise Exception(as_field_error(sec_id, field_exceptions))
+
                 record_list = list()
                 field_data = security_data.getElement("fieldData")
                 for i in range(field_data.numValues()):

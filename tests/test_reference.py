@@ -46,6 +46,18 @@ class TestReferenceRequest(unittest.TestCase):
 
         self.assertEqual(ex.exception.args[0][0][-1], "INVALID_FIELD")
 
+    def test_one_bad_field(self):
+        data = bb.ReferenceDataRequest(
+            "AAPL US Equity",
+            [
+                self.field,
+                "PX_LAST",
+                "bad field"
+            ],
+            ignore_field_error=True
+        ).data
+        self.assertFalse(data.empty)
+
 
 class TestHistoricalRequest(unittest.TestCase):
 
@@ -76,6 +88,7 @@ class TestHistoricalRequest(unittest.TestCase):
                 self.start_date,
                 self.end_date
             )
+        #print(ex.exception)
         self.assertEqual(ex.exception.args[-1][-1], "INVALID_SECURITY")
 
     def test_one_bad_sec(self):
@@ -88,3 +101,27 @@ class TestHistoricalRequest(unittest.TestCase):
         ).data
         self.assertFalse(data.empty)
 
+    def test_bad_field(self):
+        with self.assertRaises(Exception) as ex:
+            data = bb.HistoricalDataRequest(
+                self.ticker,
+                "bad field",
+                self.start_date,
+                self.end_date
+            )
+
+        self.assertEqual(ex.exception.args[0][0][-1], "NOT_APPLICABLE_TO_HIST_DATA")
+
+    def test_one_bad_field(self):
+        data = bb.HistoricalDataRequest(
+            "AAPL US Equity",
+            [
+                "PX_OPEN",
+                "PX_LAST",
+                "bad field"
+            ],
+            self.start_date,
+            self.end_date,
+            ignore_field_error=True
+        ).data
+        self.assertFalse(data.empty)
