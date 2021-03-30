@@ -24,7 +24,7 @@ class PortfolioDataRequest(StaticReferenceData):
         """
         self.port_id = port_id
         self.field = field
-        self.ref_data = ref_date
+        self.ref_date = ref_date
         super(PortfolioDataRequest, self).__init__(**kwargs)
 
     def generate_request(self):
