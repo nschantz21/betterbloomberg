@@ -34,7 +34,7 @@ class PortfolioDataRequest(StaticReferenceData):
         pFields = self.request.getElement("fields")
         pFields.appendValue(self.field)
 
-        if self.ref_data is not None:
+        if self.ref_date is not None:
             overrides = self.request.getElement("overrides")
             overrider = overrides.appendElement()
             overrider.setElement("fieldId", "REFERENCE_DATE")
