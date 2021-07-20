@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="betterbloomberg",
-    version="0.0.5",
+    version="0.0.6",
     description="A simple wrapper for the Bloomberg Python API",
     long_description=long_description,
     long_description_content_type="text/markdown",

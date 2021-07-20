@@ -138,6 +138,7 @@ class HistoricalDataRequest(ReferenceDataRequest):
         end: str = None,
         period: str = "DAILY",
         period_adjust: str = "ACTUAL",
+        maxlimit: int = 100,
         overrides=None,
         **kwargs
     ):
@@ -164,6 +165,7 @@ class HistoricalDataRequest(ReferenceDataRequest):
         self.end = end
         self.period = period
         self.period_adjust = period_adjust
+        self.maxlimit = maxlimit
         super(HistoricalDataRequest, self).__init__(
             securities, fields, overrides, **kwargs
         )
@@ -175,7 +177,7 @@ class HistoricalDataRequest(ReferenceDataRequest):
         self.request.set("periodicityAdjustment", self.period_adjust)
         self.request.set("startDate", self.start)
         self.request.set("endDate", self.end)
-        self.request.set("maxDataPoints", 100)
+        self.request.set("maxDataPoints", self.maxlimit)
 
     def send_request(self, correlation_id=None):
         eQ = blpapi.event.EventQueue()
